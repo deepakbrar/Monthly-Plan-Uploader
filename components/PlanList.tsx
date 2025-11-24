@@ -1,6 +1,6 @@
 import React from 'react';
+import { Trash2, Download, XCircle, ListChecks } from 'lucide-react';
 import { PlanTask } from '../types';
-import { Trash2, FileJson } from 'lucide-react';
 
 interface PlanListProps {
   tasks: PlanTask[];
@@ -9,94 +9,79 @@ interface PlanListProps {
   onExport: () => void;
 }
 
-export const PlanList: React.FC<PlanListProps> = ({ tasks, onDelete, onClear, onExport }) => {
+export const PlanList: React.FC<PlanListProps> = ({
+  tasks,
+  onDelete,
+  onClear,
+  onExport
+}) => {
   if (tasks.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center flex flex-col items-center justify-center h-64">
-        <div className="bg-gray-100 p-4 rounded-full mb-4">
-          <FileJson className="text-gray-400" size={32} />
-        </div>
-        <h3 className="text-lg font-medium text-gray-900">No Plans Added Yet</h3>
-        <p className="mt-1 text-sm text-gray-500">Use the form above to add tasks to your monthly plan.</p>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <ListChecks size={48} className="mx-auto text-gray-300 mb-3" />
+        <p className="text-gray-500 text-lg">No tasks added yet</p>
+        <p className="text-gray-400 text-sm mt-1">Add tasks above to build your monthly plan</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50">
-        <div>
-          <h3 className="text-lg leading-6 font-bold text-gray-900">
-            Review Queue ({tasks.length})
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">Ready for export to n8n/Google Sheets</p>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <ListChecks size={20} className="text-gray-600" />
+          <span className="font-medium text-gray-700">
+            {tasks.length} Task{tasks.length !== 1 ? 's' : ''} Planned
+          </span>
         </div>
         <div className="flex gap-2">
-           <button
+          <button
             onClick={onClear}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors"
           >
+            <XCircle size={16} />
             Clear All
           </button>
           <button
             onClick={onExport}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2 transition-colors"
           >
-            Download CSV
+            <Download size={16} />
+            Export CSV
           </button>
         </div>
       </div>
-      
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hotel (Related To)</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-              <th scope="col" className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {tasks.map((task) => (
-              <tr key={task.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                  {task.ownerName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {task.whatName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${task.subject === 'Site Visit' ? 'bg-purple-100 text-purple-800' : 
-                      task.subject === 'Negotiation' ? 'bg-orange-100 text-orange-800' :
-                      task.subject === 'Meeting' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'}`}>
+
+      <div className="divide-y divide-gray-200">
+        {tasks.map((task) => (
+          <div key={task.id} className="p-4 hover:bg-gray-50 transition-colors">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                     {task.subject}
                   </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={task.description}>
-                  {task.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                  {task.dueDate}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => onDelete(task.id)}
-                    className="text-red-400 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <span className="text-sm text-gray-500">
+                    Due: {task.dueDate}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600 mb-1">
+                  <strong>Owner:</strong> {task.ownerName} • <strong>Hotel:</strong> {task.whatName}
+                </div>
+                {task.description && (
+                  <p className="text-sm text-gray-700 mt-2">{task.description}</p>
+                )}
+              </div>
+              <button
+                onClick={() => onDelete(task.id)}
+                className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Delete task"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
