@@ -178,7 +178,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-green-800 text-sm font-medium">
-              ✅ Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
+            Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
             </p>
           </div>
         </div>
