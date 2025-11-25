@@ -42,7 +42,7 @@ const App: React.FC = () => {
       setHotels(data.hotels);
       setSubjects(data.subjects);
       
-      console.log('✅ Successfully loaded from Google Sheets:', {
+      console.log('Successfully loaded from Google Sheets:', {
         users: data.users.length,
         hotels: data.hotels.length,
         subjects: data.subjects.length,
@@ -184,11 +184,13 @@ const App: React.FC = () => {
         </div>
 
         {/* Context Selectors */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             1. Select Context
             <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Required</span>
           </h2>
+      
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <div>
