@@ -11,10 +11,10 @@ export const HeroHeader = () => {
             alt="Atica Logo" 
             className="h-12 w-auto"
           />
-          <h1 className="text-3xl font-bold">SFDC Monthly Plan Uploader</h1>
+          <h1 className="text-3xl font-bold">Sales Monthly Plan Uploader</h1>
         </div>
         <p className="text-blue-100 ml-16">
-          Create and export Salesforce monthly task plans
+          Create and export Salesforce Monthly Plan tasks
         </p>
       </div>
     </header>
