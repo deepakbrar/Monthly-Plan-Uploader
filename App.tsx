@@ -3,61 +3,68 @@ import { HeroHeader } from './components/HeroHeader';
 import { QuickAdd } from './components/QuickAdd';
 import { PlanList } from './components/PlanList';
 import { fetchGoogleSheetData } from './services/googleSheetsService';
-import { MOCK_USERS, MOCK_HOTELS, CSV_HEADERS } from './constants';
+import { CSV_HEADERS } from './constants';
 import { SalesPerson, Hotel, PlanTask } from './types';
-import { Users, Building2, Loader2, AlertCircle } from 'lucide-react';
+import { Users, Building2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 
 const App: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<SalesPerson | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [taskList, setTaskList] = useState<PlanTask[]>([]);
   
-  // Data state
+  // Data from Google Sheets (mandatory)
   const [users, setUsers] = useState<SalesPerson[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [usingMockData, setUsingMockData] = useState(false);
 
-  // Load data from Google Sheets on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await fetchGoogleSheetData();
-        
-        // Set data from Google Sheets
-        setUsers(data.users || []);
-        setHotels(data.hotels || []);
-        setSubjects(data.subjects || []);
-        setUsingMockData(false);
-        
-        console.log('✅ Loaded data from Google Sheets:', {
-          users: data.users.length,
-          hotels: data.hotels.length,
-          subjects: data.subjects.length,
-        });
-        
-      } catch (err) {
-        console.error('❌ Failed to load Google Sheets data:', err);
-        
-        // Use mock data as fallback
-        setUsers(MOCK_USERS || []);
-        setHotels(MOCK_HOTELS || []);
-        setSubjects([]);
-        setUsingMockData(true);
-        
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        setError(errorMessage);
-        
-      } finally {
-        setLoading(false);
+  // Load data from Google Sheets
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await fetchGoogleSheetData();
+      
+      // Validate that we got data
+      if (!data.users || data.users.length === 0) {
+        throw new Error('No users found in Google Sheets. Please add data to the "Users" tab.');
       }
-    };
+      if (!data.hotels || data.hotels.length === 0) {
+        throw new Error('No hotels found in Google Sheets. Please add data to the "Hotels" tab.');
+      }
+      if (!data.subjects || data.subjects.length === 0) {
+        throw new Error('No subjects found in Google Sheets. Please add data to the "Subjects" tab.');
+      }
+      
+      setUsers(data.users);
+      setHotels(data.hotels);
+      setSubjects(data.subjects);
+      
+      console.log('✅ Successfully loaded from Google Sheets:', {
+        users: data.users.length,
+        hotels: data.hotels.length,
+        subjects: data.subjects.length,
+      });
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load data from Google Sheets';
+      console.error('❌ Google Sheets Error:', err);
+      setError(errorMessage);
+      
+      // Don't set any fallback data - keep arrays empty
+      setUsers([]);
+      setHotels([]);
+      setSubjects([]);
+      
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Load on mount
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -117,7 +124,44 @@ const App: React.FC = () => {
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-700 font-medium text-lg">Loading data from Google Sheets...</p>
-          <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+          <p className="text-gray-500 text-sm mt-2">Please wait...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state - block app usage if Google Sheets fails
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-red-200">
+            <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
+              Unable to Load Data
+            </h2>
+            <p className="text-gray-600 text-center mb-6">
+              {error}
+            </p>
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-sm text-gray-700">
+              <p className="font-semibold mb-2">Please check:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Google Sheets API key is valid</li>
+                <li>Spreadsheet is shared publicly (Anyone with link → Viewer)</li>
+                <li>Spreadsheet has tabs: Users, Hotels, Subjects</li>
+                <li>Each tab has data starting from row 2</li>
+              </ul>
+            </div>
+            <button
+              onClick={loadData}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              <RefreshCw size={20} />
+              Retry Connection
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -129,49 +173,15 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Error/Warning Banner */}
-        {error && (
-          <div className={`rounded-lg p-4 mb-6 border ${
-            usingMockData 
-              ? 'bg-yellow-50 border-yellow-200' 
-              : 'bg-red-50 border-red-200'
-          }`}>
-            <div className="flex items-start gap-3">
-              <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                usingMockData ? 'text-yellow-600' : 'text-red-600'
-              }`} />
-              <div className="flex-1">
-                <h3 className={`font-semibold ${
-                  usingMockData ? 'text-yellow-800' : 'text-red-800'
-                }`}>
-                  {usingMockData ? '⚠️ Using Mock Data' : '❌ Google Sheets Error'}
-                </h3>
-                <p className={`text-sm mt-1 ${
-                  usingMockData ? 'text-yellow-700' : 'text-red-700'
-                }`}>
-                  {error}
-                </p>
-                {usingMockData && (
-                  <p className="text-xs text-yellow-600 mt-2">
-                    Configure Google Sheets API in your .env.local file to load real data.
-                  </p>
-                )}
-              </div>
-            </div>
+        {/* Success indicator */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <p className="text-green-800 text-sm font-medium">
+              ✅ Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
+            </p>
           </div>
-        )}
-
-        {/* Success Banner */}
-        {!error && !usingMockData && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <p className="text-green-800 text-sm font-medium">
-                ✅ Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
-              </p>
-            </div>
-          </div>
-        )}
+        </div>
 
         {/* Context Selectors */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
@@ -181,7 +191,6 @@ const App: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Sales Person Select */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 <Users size={16} />
@@ -202,12 +211,8 @@ const App: React.FC = () => {
                   </option>
                 ))}
               </select>
-              {users.length === 0 && (
-                <p className="text-xs text-red-600 mt-1">⚠️ No users available</p>
-              )}
             </div>
 
-            {/* Hotel Select */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 <Building2 size={16} />
@@ -228,9 +233,6 @@ const App: React.FC = () => {
                   </option>
                 ))}
               </select>
-              {hotels.length === 0 && (
-                <p className="text-xs text-red-600 mt-1">⚠️ No hotels available</p>
-              )}
             </div>
           </div>
         </div>
