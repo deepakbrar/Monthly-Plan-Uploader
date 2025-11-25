@@ -9,7 +9,7 @@ export const HeroHeader = () => {
           <img 
             src={aticaLogo} 
             alt="Atica Logo" 
-            className="h-12 w-auto bg-white rounded p-1"
+            className="h-16 w-auto bg-white rounded p-1"
           />
           <h1 className="text-3xl font-bold">Sales Monthly Plan Uploader</h1>
         </div>
