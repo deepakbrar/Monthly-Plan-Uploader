@@ -5,14 +5,14 @@ import { SalesPerson, Hotel, PlanTask } from '../types';
 interface QuickAddProps {
   selectedUser: SalesPerson | null;
   selectedHotel: Hotel | null;
-  subjectOptions: string[];
+  subjects: string[];  // Changed from subjectOptions to subjects
   onAddTasks: (tasks: PlanTask[]) => void;
 }
 
 export const QuickAdd: React.FC<QuickAddProps> = ({
   selectedUser,
   selectedHotel,
-  subjectOptions,
+  subjects,  // Changed from subjectOptions to subjects
   onAddTasks
 }) => {
   const [subject, setSubject] = useState('');
@@ -21,7 +21,7 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
 
   const handleAdd = () => {
     if (!selectedUser || !selectedHotel || !subject || !dueDate) {
-      alert('Please fill all required fields and select context');
+      alert('Please fill all required fields and select context (User & Hotel)');
       return;
     }
 
@@ -32,7 +32,7 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
       whatId: selectedHotel.id,
       whatName: selectedHotel.name,
       subject,
-      description,
+      description: description || 'No description provided',
       dueDate,
       taskType: 'Monthly Plan',
       status: 'Not Started'
@@ -45,6 +45,9 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
     setDescription('');
     setDueDate('');
   };
+
+  // Defensive check for subjects array
+  const availableSubjects = subjects || [];
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -59,10 +62,19 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
             onChange={(e) => setSubject(e.target.value)}
           >
             <option value="">-- Select Subject --</option>
-            {subjectOptions.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
+            {availableSubjects.length > 0 ? (
+              availableSubjects.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))
+            ) : (
+              <option value="" disabled>No subjects available</option>
+            )}
           </select>
+          {availableSubjects.length === 0 && (
+            <p className="text-xs text-amber-600 mt-1">
+              ⚠️ Configure subjects in Google Sheets
+            </p>
+          )}
         </div>
 
         <div>
@@ -75,13 +87,15 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
             className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]}
           />
         </div>
 
         <div className="flex items-end">
           <button
             onClick={handleAdd}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            disabled={!selectedUser || !selectedHotel}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
           >
             <Plus size={20} />
             Add to Plan
