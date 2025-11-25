@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileSpreadsheet, Upload } from 'lucide-react';
+import aticaLogo from '../assets/atica-logo.png';
 
 export const HeroHeader = () => {
   return (
@@ -7,9 +7,9 @@ export const HeroHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 mb-2">
           <img 
-            src="Monthly-Plan-Uploader/public/images/atica-logo.png" 
+            src={aticaLogo} 
             alt="Atica Logo" 
-            className="h-12 w-auto"
+            className="h-12 w-auto bg-white rounded p-1"
           />
           <h1 className="text-3xl font-bold">Sales Monthly Plan Uploader</h1>
         </div>
