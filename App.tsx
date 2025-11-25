@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { HeroHeader } from './components/HeroHeader';
 import { QuickAdd } from './components/QuickAdd';
 import { PlanList } from './components/PlanList';
-import { fetchGoogleSheetData } from './services/googleSheetService';
+import { fetchGoogleSheetData } from './services/googleSheetsService';
 import { MOCK_USERS, MOCK_HOTELS, CSV_HEADERS } from './constants';
 import { SalesPerson, Hotel, PlanTask } from './types';
 import { Users, Building2, Loader2, AlertCircle } from 'lucide-react';
