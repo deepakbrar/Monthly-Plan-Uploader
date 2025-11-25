@@ -7,7 +7,7 @@ export const HeroHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 mb-2">
           <img 
-            src="/images/atica-logo.png" 
+            src="public/images/atica-logo.png" 
             alt="Atica Logo" 
             className="h-12 w-auto"
           />
