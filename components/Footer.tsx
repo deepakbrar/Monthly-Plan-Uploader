@@ -5,7 +5,7 @@ export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-6 mt-auto border-blue-800">
+    <footer className="bg-[#004A98] text-white py-6 mt-auto border-blue-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           
