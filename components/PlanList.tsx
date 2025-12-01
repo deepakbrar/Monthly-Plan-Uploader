@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Download, XCircle, ListChecks } from 'lucide-react';
+import { Trash2, Upload, XCircle, ListChecks, Loader2 } from 'lucide-react';
 import { PlanTask } from '../types';
 
 interface PlanListProps {
@@ -7,13 +7,15 @@ interface PlanListProps {
   onDelete: (id: string) => void;
   onClear: () => void;
   onExport: () => void;
+  uploading?: boolean;
 }
 
 export const PlanList: React.FC<PlanListProps> = ({
   tasks,
   onDelete,
   onClear,
-  onExport
+  onExport,
+  uploading = false
 }) => {
   if (tasks.length === 0) {
     return (
@@ -37,17 +39,28 @@ export const PlanList: React.FC<PlanListProps> = ({
         <div className="flex gap-2">
           <button
             onClick={onClear}
-            className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors"
+            disabled={uploading}
+            className="px-4 py-2 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center gap-2 transition-colors"
           >
             <XCircle size={16} />
             Clear All
           </button>
           <button
             onClick={onExport}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2 transition-colors"
+            disabled={uploading}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-2 transition-colors"
           >
-            <Download size={16} />
-            Export CSV
+            {uploading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload size={16} />
+                Upload to Sheets
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -74,7 +87,8 @@ export const PlanList: React.FC<PlanListProps> = ({
               </div>
               <button
                 onClick={() => onDelete(task.id)}
-                className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                disabled={uploading}
+                className="ml-4 p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                 title="Delete task"
               >
                 <Trash2 size={18} />
