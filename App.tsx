@@ -169,10 +169,10 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
       <HeroHeader />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         
         {/* Success indicator */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -263,6 +263,8 @@ const App: React.FC = () => {
         </div>
 
       </main>
+
+      <Footer />
     </div>
   );
 };
