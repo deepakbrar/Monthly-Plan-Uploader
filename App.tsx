@@ -3,7 +3,7 @@ import { HeroHeader } from './components/HeroHeader';
 import { QuickAdd } from './components/QuickAdd';
 import { PlanList } from './components/PlanList';
 import { fetchGoogleSheetData } from './services/googleSheetsService';
-import { CSV_HEADERS } from './constants';
+import { uploadTasksToGoogleSheets } from './services/googleSheetsUpload';
 import { SalesPerson, Hotel, PlanTask } from './types';
 import { Users, Building2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Load data from Google Sheets
   const loadData = async () => {
@@ -42,7 +43,7 @@ const App: React.FC = () => {
       setHotels(data.hotels);
       setSubjects(data.subjects);
       
-      console.log('Successfully loaded from Google Sheets:', {
+      console.log('✅ Successfully loaded from Google Sheets:', {
         users: data.users.length,
         hotels: data.hotels.length,
         subjects: data.subjects.length,
@@ -82,39 +83,38 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const handleExportCSV = useCallback(() => {
+  // Replace CSV export with Google Sheets upload
+  const handleUploadToSheets = useCallback(async () => {
     if (taskList.length === 0) {
-      alert('No tasks to export. Please add tasks first.');
+      alert('No tasks to upload. Please add tasks first.');
       return;
     }
 
-    const csvRows = [
-      CSV_HEADERS.join(','),
-      ...taskList.map(task => {
-        const safeDesc = `"${task.description.replace(/"/g, '""')}"`;
-        return [
-          task.ownerId,
-          task.ownerName,
-          task.whatId,
-          task.whatName,
-          task.subject,
-          safeDesc,
-          task.dueDate,
-          task.taskType
-        ].join(',');
-      })
-    ];
+    const confirmed = window.confirm(
+      `Upload ${taskList.length} task(s) to Google Sheets?\n\nThis will add them to the "Tasks" tab.`
+    );
+    
+    if (!confirmed) return;
 
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `monthly_plan_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    try {
+      setUploading(true);
+
+      const result = await uploadTasksToGoogleSheets(taskList);
+      
+      if (result.success) {
+        alert(`✅ Success! ${result.rowsAdded} tasks uploaded to Google Sheets.\n\nCheck the "Tasks" tab in your spreadsheet.`);
+        // Clear the task list after successful upload
+        setTaskList([]);
+      } else {
+        alert(`❌ Upload failed: ${result.error}\n\nPlease check your Google Apps Script configuration.`);
+      }
+      
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('❌ Failed to upload tasks. Please try again or check your configuration.');
+    } finally {
+      setUploading(false);
+    }
   }, [taskList]);
 
   // Loading state
@@ -178,19 +178,18 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-green-800 text-sm font-medium">
-            Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
+              ✅ Connected to Google Sheets ({users.length} users, {hotels.length} hotels, {subjects.length} subjects)
             </p>
           </div>
         </div>
 
         {/* Context Selectors */}
         <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            1. Select Context
-            <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Required</span>
-          </h2>
+          1. Select Context
+          <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Required</span>
+        </h2>
       
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-      
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <div>
@@ -252,12 +251,13 @@ const App: React.FC = () => {
 
         {/* Review List */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">3. Review & Export</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">3. Review & Upload</h2>
           <PlanList 
             tasks={taskList} 
             onDelete={handleDeleteTask} 
             onClear={handleClearAll}
-            onExport={handleExportCSV}
+            onExport={handleUploadToSheets}
+            uploading={uploading}
           />
         </div>
 
