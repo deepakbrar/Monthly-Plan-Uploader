@@ -95,7 +95,7 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
           <button
             onClick={handleAdd}
             disabled={!selectedUser || !selectedHotel}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-[#004A98] hover:bg-blue-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
           >
             <Plus size={20} />
             Add to Plan
