@@ -3,7 +3,7 @@ import aticaLogo from '../assets/atica-logo.png';
 
 export const HeroHeader = () => {
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 shadow-lg">
+    <header className="bg-[#004A98] text-white py-8 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4 mb-2">
           <img 
