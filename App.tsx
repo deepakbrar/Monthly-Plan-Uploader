@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { HeroHeader } from './components/HeroHeader';
 import { QuickAdd } from './components/QuickAdd';
 import { PlanList } from './components/PlanList';
+import { Footer } from './components/Footer';
 import { fetchGoogleSheetData } from './services/googleSheetsService';
 import { uploadTasksToGoogleSheets } from './services/googleSheetsUpload';
 import { SalesPerson, Hotel, PlanTask } from './types';
