@@ -6,11 +6,12 @@ import { Footer } from './components/Footer';
 import { fetchGoogleSheetData } from './services/googleSheetsService';
 import { uploadTasksToGoogleSheets } from './services/googleSheetsUpload';
 import { SalesPerson, Hotel, PlanTask } from './types';
-import { Users, Building2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Users, Building2, Loader2, AlertCircle, RefreshCw, CalendarDays } from 'lucide-react';
 
 const App: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<SalesPerson | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [taskList, setTaskList] = useState<PlanTask[]>([]);
   
   // Data from Google Sheets (mandatory)
@@ -20,6 +21,22 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Generate next 12 months for the month picker
+  const getMonthOptions = () => {
+    const months = [];
+    const currentDate = new Date();
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+      const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const shortMonth = date.toLocaleDateString('en-US', { month: 'short' });
+      const year = date.getFullYear();
+      months.push({ value: monthYear, label: shortMonth, year, fullLabel: monthYear });
+    }
+    return months;
+  };
+
+  const monthOptions = getMonthOptions();
 
   // Load data from Google Sheets
   const loadData = async () => {
@@ -191,7 +208,7 @@ const App: React.FC = () => {
         </h2>
       
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -237,6 +254,44 @@ const App: React.FC = () => {
               </select>
             </div>
           </div>
+
+          {/* Month Picker Section */}
+          <div className="border-t border-gray-100 pt-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+              <CalendarDays size={16} />
+              Planning Month
+              <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Required</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {monthOptions.map((month) => (
+                <button
+                  key={month.value}
+                  onClick={() => setSelectedMonth(month.value)}
+                  className={`
+                    relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200
+                    ${selectedMonth === month.value
+                      ? 'bg-gradient-to-r from-[#004A98] to-blue-600 text-white shadow-md scale-105 ring-2 ring-blue-300'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-sm border border-gray-200'
+                    }
+                  `}
+                >
+                  <span className="block">{month.label}</span>
+                  <span className={`block text-xs mt-0.5 ${selectedMonth === month.value ? 'text-blue-100' : 'text-gray-400'}`}>
+                    {month.year}
+                  </span>
+                  {selectedMonth === month.value && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></span>
+                  )}
+                </button>
+              ))}
+            </div>
+            {selectedMonth && (
+              <p className="mt-3 text-sm text-green-600 flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Selected: <strong>{selectedMonth}</strong>
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Input Area */}
@@ -245,6 +300,7 @@ const App: React.FC = () => {
           <QuickAdd 
             selectedUser={selectedUser} 
             selectedHotel={selectedHotel}
+            selectedMonth={selectedMonth}
             subjects={subjects}
             onAddTasks={handleAddTasks} 
           />
