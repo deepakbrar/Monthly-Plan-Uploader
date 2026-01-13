@@ -8,6 +8,7 @@ interface UploadTask {
   subject: string;
   description: string;
   dueDate: string;
+  month: string; // Selected month for planning
   taskType: string;
   status?: string;
 }
