@@ -26,6 +26,7 @@ export interface PlanTask {
   subject: TaskSubject;
   description: string; // Comments
   dueDate: string; // YYYY-MM-DD
+  month: string; // Selected month (e.g., "January 2025")
   taskType: 'Monthly Plan'; // Hardcoded
   status: 'Not Started'; // Default SFDC status
 }
