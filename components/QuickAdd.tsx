@@ -5,6 +5,7 @@ import { SalesPerson, Hotel, PlanTask } from '../types';
 interface QuickAddProps {
   selectedUser: SalesPerson | null;
   selectedHotel: Hotel | null;
+  selectedMonth: string;
   subjects: string[];  // Changed from subjectOptions to subjects
   onAddTasks: (tasks: PlanTask[]) => void;
 }
@@ -12,6 +13,7 @@ interface QuickAddProps {
 export const QuickAdd: React.FC<QuickAddProps> = ({
   selectedUser,
   selectedHotel,
+  selectedMonth,
   subjects,  // Changed from subjectOptions to subjects
   onAddTasks
 }) => {
@@ -20,8 +22,8 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
   const [dueDate, setDueDate] = useState('');
 
   const handleAdd = () => {
-    if (!selectedUser || !selectedHotel || !subject || !dueDate) {
-      alert('Please fill all required fields and select context (User & Hotel)');
+    if (!selectedUser || !selectedHotel || !selectedMonth || !subject || !dueDate) {
+      alert('Please fill all required fields and select context (User, Hotel & Month)');
       return;
     }
 
@@ -34,6 +36,7 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
       subject,
       description: description || 'No description provided',
       dueDate,
+      month: selectedMonth,
       taskType: 'Monthly Plan',
       status: 'Not Started'
     };
@@ -94,7 +97,7 @@ export const QuickAdd: React.FC<QuickAddProps> = ({
         <div className="flex items-end">
           <button
             onClick={handleAdd}
-            disabled={!selectedUser || !selectedHotel}
+            disabled={!selectedUser || !selectedHotel || !selectedMonth}
             className="w-full bg-[#004A98] hover:bg-blue-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
           >
             <Plus size={20} />
